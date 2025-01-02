@@ -1,0 +1,143 @@
+name: 🚀 Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      tag:
+        description: 'Image tag to deploy'
+        required: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_tag: ${{ steps.get_tag.outputs.tag }}
+      repo_name: ${{ steps.repo_name.outputs.name }}
+      app_name: ${{ steps.app_name.outputs.name }}
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set Repository Name
+        id: repo_name
+        run: |
+          echo "name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Set App Name
+        id: app_name
+        run: |
+          echo "name=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]' | tr '_' '-')" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PACKAGE_PAT }}
+      
+      - name: Get Image Tag
+        id: get_tag
+        run: |
+          TAG=${{ github.event.inputs.tag }}
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG=$(date +'%Y%m%d')-${GITHUB_SHA::7}
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Verify Image Exists
+        run: |
+          IMAGE="ghcr.io/${{ steps.repo_name.outputs.name }}:${{ steps.get_tag.outputs.tag }}"
+          
+          echo "🔍 Verifying image: $IMAGE"
+          
+          # Try to inspect the image
+          if ! docker pull $IMAGE >/dev/null 2>&1; then
+            echo "❌ Error: Image $IMAGE not found in registry"
+            echo "Please ensure the image was built and pushed successfully in the development pipeline"
+            exit 1
+          fi
+          
+          echo "✅ Image verification successful"
+      
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install OpenShift CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+          tar -xvf openshift-client-linux.tar.gz -C /usr/local/bin
+          chmod +x /usr/local/bin/oc
+        
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+        
+      - name: Login to OpenShift
+        run: |
+          oc login --token=${{ secrets.OSC_PROD_TOKEN }} --server=${{ secrets.OSC_SERVER }}
+  
+      - name: Clone Platform Config
+        uses: actions/checkout@v3
+        with:
+          repository: PTSS-Support/platform-config
+          path: platform-config
+          token: ${{ secrets.PLATFORM_CONFIG_PAT }}
+
+      - name: Apply Platform Configs
+        run: |
+          NAMESPACE=${{ vars.OSC_PROD_PROJECT }}
+          
+          # Apply common configs
+          for config_type in configmaps secrets; do
+            for path in \
+              "platform-config/common/${config_type}" \
+              "platform-config/apps/${{ needs.prepare.outputs.app_name }}/${config_type}" \
+              "platform-config/environments/prod/common/${config_type}" \
+              "platform-config/environments/prod/apps/${{ needs.prepare.outputs.app_name }}/${config_type}"; do
+                if [ -d "${path}" ] && [ "$(ls -A ${path})" ]; then
+                  oc apply -f "${path}" -n ${NAMESPACE}
+                fi
+            done
+          done
+      
+      - name: Deploy to OpenShift Prod
+        run: |
+          ROUTE_HOST="${{ needs.prepare.outputs.app_name }}.${{ vars.APPS_DOMAIN }}"
+          
+          helm upgrade --install ${{ needs.prepare.outputs.app_name }} ./helm \
+            --namespace ${{ vars.OSC_PROD_PROJECT }} \
+            --values ./helm/values.yaml \
+            --values ./helm/values-prod.yaml \
+            --set image.registry=ghcr.io \
+            --set image.repository=${{ needs.prepare.outputs.repo_name }} \
+            --set image.tag=${{ needs.prepare.outputs.image_tag }} \
+            --set route.host=${ROUTE_HOST}
+            
+      - name: Wait for Deployment
+        run: |
+          oc rollout status deployment/${{ needs.prepare.outputs.app_name }} -n ${{ vars.OSC_PROD_PROJECT }} --timeout=150s
+
+      - name: Verify Deployment
+        run: |
+          # Check if all pods are ready
+          READY_PODS=$(oc get deployment ${{ needs.prepare.outputs.app_name }} -n ${{ vars.OSC_PROD_PROJECT }} -o jsonpath='{.status.readyReplicas}')
+          DESIRED_PODS=$(oc get deployment ${{ needs.prepare.outputs.app_name }} -n ${{ vars.OSC_PROD_PROJECT }} -o jsonpath='{.spec.replicas}')
+          
+          if [ "$READY_PODS" != "$DESIRED_PODS" ]; then
+            echo "❌ Deployment verification failed: $READY_PODS/$DESIRED_PODS pods ready"
+            exit 1
+          fi
+
+          echo "✅ Deployment verification successful: $READY_PODS/$DESIRED_PODS pods ready"
