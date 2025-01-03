@@ -1,4 +1,4 @@
-# ptss-support-quarkus
+# Content-Service
 
 ## Overview
 
@@ -32,7 +32,7 @@ This is a template repository for a Quarkus-based microservice project. It provi
 - GraalVM (optional, for native compilation)
 
 ## Setup and Configuration
-
+    
 ### Local Development Setup
 
 1. Clone the repository
