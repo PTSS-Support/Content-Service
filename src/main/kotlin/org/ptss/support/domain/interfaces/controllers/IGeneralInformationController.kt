@@ -10,6 +10,7 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
+import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.common.exceptions.ServiceError
 
@@ -22,7 +23,7 @@ interface IGeneralInformationController {
         APIResponse(
             responseCode = "201",
             description = "general-information successfully created",
-            content = [Content(schema = Schema(implementation = GeneralInformationListItemResponse::class))]
+            content = [Content(schema = Schema(implementation = CreateGeneralInformationResponse::class))]
         ),
         APIResponse(
             responseCode = "400",
@@ -42,5 +43,5 @@ interface IGeneralInformationController {
             content = [Content(schema = Schema(implementation = ServiceError::class))]
         )
     )
-    suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): GeneralInformationListItemResponse
+    suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): CreateGeneralInformationResponse
 }

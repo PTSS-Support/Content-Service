@@ -1,5 +1,6 @@
 package org.ptss.support.core.services
 
+import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.enums.ErrorCode
@@ -7,6 +8,7 @@ import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.slf4j.LoggerFactory
 
+@ApplicationScoped
 class GeneralInformationService(
     private val createGeneralInformationHandler: ICommandHandler<CreateGeneralInformationCommand, String>
 ) {
