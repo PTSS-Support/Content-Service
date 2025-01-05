@@ -6,6 +6,6 @@ data class GeneralInformation(
     val id: UUID,
     val title: String,
     val content: String,
-    val media: List<MediaInfo>
+    val media: MediaInfo? = null
 )
 

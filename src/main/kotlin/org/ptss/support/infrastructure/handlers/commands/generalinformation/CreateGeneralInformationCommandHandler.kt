@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.domain.models.GeneralInformation
+import org.ptss.support.infrastructure.repositories.GeneralInformationRepository
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.slf4j.LoggerFactory
 import java.util.UUID
@@ -20,8 +21,7 @@ class CreateGeneralInformationCommandHandler(
                 val generalInformation = GeneralInformation(
                     id = UUID.randomUUID(),
                     title = command.title,
-                    content = command.content,
-                    media = command.
+                    content = command.content
                 )
                 generalInformationRepository.create(generalInformation)
             },
