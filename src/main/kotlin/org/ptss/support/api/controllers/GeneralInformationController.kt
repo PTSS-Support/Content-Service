@@ -15,7 +15,7 @@ import java.util.UUID
 
 @Path("/general-information")
 @ApplicationScoped
-//@Authentication(roles = [Role.ADMIN])
+@Authentication(roles = [Role.ADMIN])
 class GeneralInformationController(
     private val generalInformationFacade: GeneralInformationFacade
 ) : IGeneralInformationController {
