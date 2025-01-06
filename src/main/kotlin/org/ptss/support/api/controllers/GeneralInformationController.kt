@@ -13,7 +13,6 @@ import org.ptss.support.core.facades.GeneralInformationFacade
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.controllers.IGeneralInformationController
 import org.ptss.support.security.Authentication
-import java.util.UUID
 
 @Path("/general-information")
 @ApplicationScoped
@@ -28,10 +27,7 @@ class GeneralInformationController(
         generalInformationFacade.getGeneralInformationById(id)
 
     override suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): CreateGeneralInformationResponse =
-        CreateGeneralInformationResponse(
-            id = UUID.fromString(generalInformationFacade.createGeneralInformation(request)),
-            title = request.title,
-            content = request.content)
+        generalInformationFacade.createGeneralInformation(request)
 
     override suspend fun updateGeneralInformation(@PathParam("id") id: String, request: UpdateGeneralInformationRequest): GeneralInformationResponse =
         generalInformationFacade.updateGeneralInformation(id, request)

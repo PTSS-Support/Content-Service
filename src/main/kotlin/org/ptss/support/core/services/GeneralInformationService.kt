@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 @ApplicationScoped
 class GeneralInformationService(
-    private val createGeneralInformationHandler: ICommandHandler<CreateGeneralInformationCommand, String>,
+    private val createGeneralInformationHandler: ICommandHandler<CreateGeneralInformationCommand, GeneralInformation>,
     private val getAllGeneralInformationHandler: GetAllGeneralInformationQueryHandler,
     private val getGeneralInformationByIdHandler: IQueryHandler<GetGeneralInformationByIdQuery, GeneralInformation?>,
     private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>,
@@ -61,7 +61,7 @@ class GeneralInformationService(
         )
     }
 
-    suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): String {
+    suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): GeneralInformation {
         //validateGeneralInformationCommand(command)
         return logger.executeWithExceptionLoggingAsync(
             operation = { createGeneralInformationHandler.handleAsync(command) },

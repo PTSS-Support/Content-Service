@@ -12,10 +12,10 @@ import java.util.UUID
 @ApplicationScoped
 class CreateGeneralInformationCommandHandler(
     private val generalInformationRepository: GeneralInformationRepository
-) : ICommandHandler<CreateGeneralInformationCommand, String> {
+) : ICommandHandler<CreateGeneralInformationCommand, GeneralInformation> {
     private val logger = LoggerFactory.getLogger(CreateGeneralInformationCommandHandler::class.java)
 
-    override suspend fun handleAsync(command: CreateGeneralInformationCommand): String {
+    override suspend fun handleAsync(command: CreateGeneralInformationCommand): GeneralInformation {
         return logger.executeWithExceptionLoggingAsync(
             operation = {
                 val generalInformation = GeneralInformation(
@@ -24,6 +24,7 @@ class CreateGeneralInformationCommandHandler(
                     content = command.content
                 )
                 generalInformationRepository.create(generalInformation)
+                generalInformation
             },
             logMessage = "Error creating general information with title: ${command.title}",
         )
