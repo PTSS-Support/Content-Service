@@ -11,6 +11,7 @@ import org.ptss.support.domain.models.GeneralInformation
 import org.ptss.support.infrastructure.config.AzureStorageConfig
 import org.ptss.support.infrastructure.persistence.entities.GeneralInformationEntity
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 @ApplicationScoped
 class GeneralInformationRepository(
@@ -34,6 +35,16 @@ class GeneralInformationRepository(
                 message = "Failed to initialize storage service",
             )
         }
+    }
+
+    override suspend fun getAll(): List<GeneralInformation> {
+        return tableClient.listEntities()
+            .map { entity ->
+                val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
+                generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
+
+            }
+            .toList()
     }
 
     override suspend fun create(generalInformation: GeneralInformation): String {

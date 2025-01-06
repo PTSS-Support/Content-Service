@@ -22,4 +22,7 @@ class GeneralInformationController(
             id = UUID.fromString(generalInformationFacade.createGeneralInformation(request)),
             title = request.title,
             content = request.content)
+
+    override suspend fun getAllGeneralInformation(): List<GeneralInformationListItemResponse> =
+        generalInformationFacade.getAllGeneralInformation()
 }

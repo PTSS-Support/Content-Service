@@ -1,6 +1,7 @@
 package org.ptss.support.domain.interfaces.controllers
 
 import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
@@ -17,6 +18,34 @@ import org.ptss.support.common.exceptions.ServiceError
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 interface IGeneralInformationController {
+    @GET
+    @Operation(summary = "Get all general information", description = "Retrieves a list of all general information")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "List of general information successfully retrieved",
+            content = [Content(schema = Schema(implementation = Array<GeneralInformationListItemResponse>::class))]
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid parameters"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        ),
+        APIResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        )
+    )
+    suspend fun getAllGeneralInformation(): List<GeneralInformationListItemResponse>
+
     @POST
     @Operation(summary = "Create general-information", description = "Creates a new general-information")
     @APIResponses(
