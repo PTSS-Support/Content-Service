@@ -1,3 +1,6 @@
 package org.ptss.support.domain.queries.generalinformation
 
-class GetAllGeneralInformationQuery()
+data class GetAllGeneralInformationQuery(
+    val cursor: String? = null,
+    val pageSize: Int = 20
+)

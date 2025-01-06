@@ -7,6 +7,8 @@ import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInform
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
+import org.ptss.support.api.dtos.responses.pagination.PagedResult
+import org.ptss.support.common.extensions.mapData
 import org.ptss.support.core.mappers.GeneralInformationMapper
 import org.ptss.support.core.services.GeneralInformationService
 
@@ -14,9 +16,9 @@ import org.ptss.support.core.services.GeneralInformationService
 class GeneralInformationFacade @Inject constructor(
     private val generalInformationService: GeneralInformationService
 ) {
-    suspend fun getAllGeneralInformation(): List<GeneralInformationListItemResponse> =
-        generalInformationService.getAllGeneralInformationAsync()
-            .map(GeneralInformationMapper::toListItemResponse)
+    suspend fun getAllGeneralInformation(cursor: String?, pageSize: Int): PagedResult<GeneralInformationListItemResponse> =
+        generalInformationService.getAllGeneralInformationAsync(cursor, pageSize)
+            .mapData(GeneralInformationMapper::toListItemResponse)
 
     suspend fun getGeneralInformationById(id: String): GeneralInformationResponse? =
         generalInformationService.getGeneralInformationByIdAsync(id)

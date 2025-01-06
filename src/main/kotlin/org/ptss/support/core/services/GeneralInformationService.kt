@@ -2,6 +2,7 @@ package org.ptss.support.core.services
 
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
+import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.commands.generalinformation.DeleteGeneralInformationCommand
@@ -15,6 +16,7 @@ import org.ptss.support.domain.queries.generalinformation.GetGeneralInformationB
 import org.ptss.support.infrastructure.handlers.queries.generalinformation.GetAllGeneralInformationQueryHandler
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.slf4j.LoggerFactory
+import kotlin.math.ceil
 
 @ApplicationScoped
 class GeneralInformationService(
@@ -26,10 +28,12 @@ class GeneralInformationService(
 ) {
     private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
 
-    suspend fun getAllGeneralInformationAsync(): List<GeneralInformation> {
+    suspend fun getAllGeneralInformationAsync(cursor: String?, pageSize: Int): PagedResult<GeneralInformation> {
         return logger.executeWithExceptionLoggingAsync(
-            operation = { getAllGeneralInformationHandler.handleAsync(GetAllGeneralInformationQuery()) },
-            logMessage = "Error retrieving all general information",
+            operation = {
+                getAllGeneralInformationHandler.handleAsync(GetAllGeneralInformationQuery(cursor, pageSize))
+            },
+            logMessage = "Error retrieving paginated general information",
             exceptionHandling = { ex ->
                 APIException(
                     errorCode = ErrorCode.GENERAL_INFORMATION_CREATION_ERROR,

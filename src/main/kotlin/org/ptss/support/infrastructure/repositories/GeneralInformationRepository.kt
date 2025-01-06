@@ -4,14 +4,18 @@ import com.azure.data.tables.TableClient
 import com.azure.data.tables.TableServiceClientBuilder
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
+import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.repositories.IGeneralInformationRepository
 import org.ptss.support.domain.models.GeneralInformation
 import org.ptss.support.infrastructure.config.AzureStorageConfig
 import org.ptss.support.infrastructure.persistence.entities.GeneralInformationEntity
+import org.ptss.support.infrastructure.util.PaginationUtils
+import org.ptss.support.infrastructure.util.PaginationUtils.paginate
 import org.slf4j.LoggerFactory
 import java.util.UUID
+import kotlin.math.ceil
 
 @ApplicationScoped
 class GeneralInformationRepository(
@@ -37,14 +41,16 @@ class GeneralInformationRepository(
         }
     }
 
-    override suspend fun getAll(): List<GeneralInformation> {
-        return tableClient.listEntities()
+    override suspend fun getAll(cursor: String?, pageSize: Int): PagedResult<GeneralInformation> {
+        val entities = tableClient.listEntities()
             .map { entity ->
-                val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
-                generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
-
+                GeneralInformationEntity.fromTableEntity(entity)
+                    .toDomain()
+                    .copy(id = UUID.fromString(entity.rowKey))
             }
             .toList()
+
+        return entities.paginate(pageSize, cursor) { it.id.toString() }
     }
 
     override suspend fun getById(id: String): GeneralInformation? {

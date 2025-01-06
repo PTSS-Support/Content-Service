@@ -1,6 +1,7 @@
 package org.ptss.support.infrastructure.handlers.queries.generalinformation
 
 import jakarta.enterprise.context.ApplicationScoped
+import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.domain.interfaces.queries.IQueryHandler
 import org.ptss.support.domain.models.GeneralInformation
 import org.ptss.support.domain.queries.generalinformation.GetAllGeneralInformationQuery
@@ -11,15 +12,14 @@ import org.slf4j.LoggerFactory
 @ApplicationScoped
 class GetAllGeneralInformationQueryHandler(
     private val generalInformationRepository: GeneralInformationRepository
-) : IQueryHandler<GetAllGeneralInformationQuery, List<GeneralInformation>> {
+) : IQueryHandler<GetAllGeneralInformationQuery, PagedResult<GeneralInformation>> {
     private val logger = LoggerFactory.getLogger(GetAllGeneralInformationQueryHandler::class.java)
 
-    override suspend fun handleAsync(query: GetAllGeneralInformationQuery): List<GeneralInformation> {
-        return logger.executeWithExceptionLoggingAsync(
+    override suspend fun handleAsync(query: GetAllGeneralInformationQuery): PagedResult<GeneralInformation> =
+        logger.executeWithExceptionLoggingAsync(
             operation = {
-                generalInformationRepository.getAll()
+                generalInformationRepository.getAll(query.cursor, query.pageSize)
             },
-            logMessage = "Error retrieving all general information"
+            logMessage = "Error retrieving paginated general information"
         )
-    }
 }

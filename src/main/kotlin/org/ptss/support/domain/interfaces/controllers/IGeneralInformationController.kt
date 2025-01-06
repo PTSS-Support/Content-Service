@@ -1,5 +1,7 @@
 package org.ptss.support.domain.interfaces.controllers
 
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
@@ -8,6 +10,8 @@ import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
+import jakarta.ws.rs.DefaultValue
+import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
@@ -21,13 +25,14 @@ import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInform
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
+import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.exceptions.ServiceError
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 interface IGeneralInformationController {
     @GET
-    @Operation(summary = "Get all general information", description = "Retrieves a list of all general information")
+    @Operation(summary = "Get all general information", description = "Retrieves a paginated list of general information")
     @APIResponses(
         APIResponse(
             responseCode = "200",
@@ -52,7 +57,10 @@ interface IGeneralInformationController {
             content = [Content(schema = Schema(implementation = ServiceError::class))]
         )
     )
-    suspend fun getAllGeneralInformation(): List<GeneralInformationListItemResponse>
+    suspend fun getAllGeneralInformation(
+        @Parameter(description = "Cursor for pagination") @QueryParam("cursor") cursor: String?,
+        @Parameter(description = "Page size (1-50)") @QueryParam("size") @DefaultValue("20") @Min(1) @Max(50) pageSize: Int
+    ): PagedResult<GeneralInformationListItemResponse>
 
     @GET
     @Path("/{id}")
