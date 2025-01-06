@@ -3,11 +3,9 @@ package org.ptss.support.core.facades
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
-import org.ptss.support.api.dtos.responses.ProductResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.core.mappers.GeneralInformationMapper
-import org.ptss.support.core.mappers.ProductMapper
 import org.ptss.support.core.services.GeneralInformationService
 
 @ApplicationScoped

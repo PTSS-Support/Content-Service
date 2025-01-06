@@ -1,16 +1,12 @@
 package org.ptss.support.core.services
 
 import jakarta.enterprise.context.ApplicationScoped
-import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.domain.interfaces.queries.IQueryHandler
 import org.ptss.support.domain.models.GeneralInformation
-import org.ptss.support.domain.models.Product
-import org.ptss.support.domain.queries.GetAllProductsQuery
-import org.ptss.support.domain.queries.GetProductByIdQuery
 import org.ptss.support.domain.queries.generalinformation.GetAllGeneralInformationQuery
 import org.ptss.support.domain.queries.generalinformation.GetGeneralInformationByIdQuery
 import org.ptss.support.infrastructure.handlers.queries.generalinformation.GetAllGeneralInformationQueryHandler
@@ -23,7 +19,7 @@ class GeneralInformationService(
     private val getAllGeneralInformationHandler: GetAllGeneralInformationQueryHandler,
     private val getGeneralInformationByIdHandler: IQueryHandler<GetGeneralInformationByIdQuery, GeneralInformation?>,
 ) {
-    private val logger = LoggerFactory.getLogger(ProductService::class.java)
+    private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
 
     suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): String {
         //validateGeneralInformationCommand(command)

@@ -4,7 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
-import org.ptss.support.api.dtos.responses.ProductResponse
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
@@ -16,7 +15,7 @@ import java.util.UUID
 
 @Path("/general-information")
 @ApplicationScoped
-@Authentication(roles = [Role.ADMIN])
+//@Authentication(roles = [Role.ADMIN])
 class GeneralInformationController(
     private val generalInformationFacade: GeneralInformationFacade
 ) : IGeneralInformationController {
