@@ -34,6 +34,7 @@ enum class ErrorCode(
     PRODUCT_CREATION_ERROR("PRODUCT_CREATION_ERROR", 400, "Failed to create product"),
 
     //General information errors
+    GENERAL_INFORMATION_NOT_FOUND("GENERAL_INFORMATION_NOT_FOUND", 404, "The requested general information was not found"),
     GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information");
 
     companion object {

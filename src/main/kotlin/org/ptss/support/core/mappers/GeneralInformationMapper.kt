@@ -2,6 +2,7 @@ package org.ptss.support.core.mappers
 
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
+import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.models.GeneralInformation
 
@@ -11,7 +12,14 @@ object GeneralInformationMapper {
         content = request.content
     )
 
-    fun toResponse(generalInformation: GeneralInformation) = GeneralInformationListItemResponse(
+    fun toResponse(generalInformation: GeneralInformation) = GeneralInformationResponse(
+        id = generalInformation.id,
+        title = generalInformation.title,
+        content = generalInformation.content,
+        media = null
+    )
+
+    fun toListItemResponse(generalInformation: GeneralInformation) = GeneralInformationListItemResponse(
         id = generalInformation.id,
         title = generalInformation.title
     )

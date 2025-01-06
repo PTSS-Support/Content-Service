@@ -4,15 +4,19 @@ import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Produces
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.core.MediaType
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
+import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
+import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.common.exceptions.ServiceError
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,6 +49,38 @@ interface IGeneralInformationController {
         )
     )
     suspend fun getAllGeneralInformation(): List<GeneralInformationListItemResponse>
+
+    @GET
+    @Path("/{id}")
+    @Operation(summary = "Get general information by ID", description = "Retrieves a specific general information by its ID")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "General information successfully retrieved",
+            content = [Content(schema = Schema(implementation = GeneralInformationResponse::class))]
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid parameters"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        ),
+        APIResponse(
+            responseCode = "404",
+            description = "General information not found",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        )
+    )
+    suspend fun getGeneralInformationById(
+        @Parameter(description = "ID of the general information", required = true)
+        @PathParam("id") id: String
+    ): GeneralInformationResponse?
 
     @POST
     @Operation(summary = "Create general-information", description = "Creates a new general-information")

@@ -47,6 +47,13 @@ class GeneralInformationRepository(
             .toList()
     }
 
+    override suspend fun getById(id: String): GeneralInformation? {
+        val entity = tableClient.getEntity("GENERAL_INFORMATION", id)
+        val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
+        return generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
+    }
+
+
     override suspend fun create(generalInformation: GeneralInformation): String {
         val generalInformationEntity = GeneralInformationEntity(
             title = generalInformation.title,
