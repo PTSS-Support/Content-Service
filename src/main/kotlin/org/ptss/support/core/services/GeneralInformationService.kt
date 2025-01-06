@@ -66,7 +66,6 @@ class GeneralInformationService(
     }
 
     suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): GeneralInformation {
-        //validateGeneralInformationCommand(command)
         return logger.executeWithExceptionLoggingAsync(
             operation = { createGeneralInformationHandler.handleAsync(command) },
             logMessage = "Error creating general information ${command.title}",
@@ -81,7 +80,6 @@ class GeneralInformationService(
 
     suspend fun updateGeneralInformationAsync(generalInformationId: String, request: UpdateGeneralInformationRequest): GeneralInformation {
         val command = UpdateGeneralInformationCommand(generalInformationId, request.title, request.content)
-        //validateUpdateCommentCommand(command)
 
         return logger.executeWithExceptionLoggingAsync(
             operation = { updateGeneralInformationHandler.handleAsync(command) },

@@ -27,7 +27,7 @@ data class GeneralInformationEntity(
     }
 
     fun toDomain(): GeneralInformation = GeneralInformation(
-        id = UUID.randomUUID(), // This should be overridden with the actual ID from TableEntity
+        id = UUID.randomUUID(),
         title = title,
         content = content
     )
