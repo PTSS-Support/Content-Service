@@ -1,8 +1,10 @@
 package org.ptss.support.core.services
 
 import jakarta.enterprise.context.ApplicationScoped
+import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
+import org.ptss.support.domain.commands.generalinformation.UpdateGeneralInformationCommand
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.domain.interfaces.queries.IQueryHandler
@@ -18,22 +20,9 @@ class GeneralInformationService(
     private val createGeneralInformationHandler: ICommandHandler<CreateGeneralInformationCommand, String>,
     private val getAllGeneralInformationHandler: GetAllGeneralInformationQueryHandler,
     private val getGeneralInformationByIdHandler: IQueryHandler<GetGeneralInformationByIdQuery, GeneralInformation?>,
+    private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>
 ) {
     private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
-
-    suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): String {
-        //validateGeneralInformationCommand(command)
-        return logger.executeWithExceptionLoggingAsync(
-            operation = { createGeneralInformationHandler.handleAsync(command) },
-            logMessage = "Error creating general information ${command.title}",
-            exceptionHandling = { ex ->
-                APIException(
-                    errorCode = ErrorCode.GENERAL_INFORMATION_CREATION_ERROR,
-                    message = "Failed to create general information ${command.title}",
-                )
-            }
-        )
-    }
 
     suspend fun getAllGeneralInformationAsync(): List<GeneralInformation> {
         return logger.executeWithExceptionLoggingAsync(
@@ -69,4 +58,39 @@ class GeneralInformationService(
             }
         )
     }
+
+    suspend fun createGeneralInformationAsync(command: CreateGeneralInformationCommand): String {
+        //validateGeneralInformationCommand(command)
+        return logger.executeWithExceptionLoggingAsync(
+            operation = { createGeneralInformationHandler.handleAsync(command) },
+            logMessage = "Error creating general information ${command.title}",
+            exceptionHandling = { ex ->
+                APIException(
+                    errorCode = ErrorCode.GENERAL_INFORMATION_CREATION_ERROR,
+                    message = "Failed to create general information ${command.title}",
+                )
+            }
+        )
+    }
+
+    suspend fun updateGeneralInformationAsync(generalInformationId: String, request: UpdateGeneralInformationRequest): GeneralInformation {
+        val command = UpdateGeneralInformationCommand(generalInformationId, request.title, request.content)
+        //validateUpdateCommentCommand(command)
+
+        return logger.executeWithExceptionLoggingAsync(
+            operation = { updateGeneralInformationHandler.handleAsync(command) },
+            logMessage = "Error updating general information $generalInformationId",
+            exceptionHandling = { ex ->
+                when (ex) {
+                    is APIException -> ex
+                    else -> APIException(
+                        errorCode = ErrorCode.GENERAL_INFORMATION_UPDATE_ERROR,
+                        message = "Failed to update general information $generalInformationId",
+                    )
+                }
+            }
+        )
+    }
+
+
 }

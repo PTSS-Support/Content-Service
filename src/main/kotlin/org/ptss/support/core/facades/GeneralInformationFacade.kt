@@ -3,6 +3,7 @@ package org.ptss.support.core.facades
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
+import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.core.mappers.GeneralInformationMapper
@@ -22,4 +23,9 @@ class GeneralInformationFacade @Inject constructor(
 
     suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): String =
         generalInformationService.createGeneralInformationAsync(GeneralInformationMapper.toCommand(request))
+
+    suspend fun updateGeneralInformation(id: String, request: UpdateGeneralInformationRequest): GeneralInformationResponse {
+        val updatedGeneralInformation = generalInformationService.updateGeneralInformationAsync(id, request)
+        return GeneralInformationMapper.toResponse(updatedGeneralInformation)
+    }
 }

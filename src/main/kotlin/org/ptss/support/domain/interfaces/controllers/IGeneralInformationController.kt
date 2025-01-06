@@ -3,6 +3,7 @@ package org.ptss.support.domain.interfaces.controllers
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
+import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
@@ -14,6 +15,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
+import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
@@ -109,4 +111,42 @@ interface IGeneralInformationController {
         )
     )
     suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): CreateGeneralInformationResponse
+
+    @PUT
+    @Path("/{id}")
+    @Operation(summary = "Update general information", description = "Updates the content/title of a existing general information by its ID")
+    @APIResponses(
+        APIResponse(
+            responseCode = "200",
+            description = "General information successfully updated",
+            content = [Content(schema = Schema(implementation = GeneralInformationResponse::class))]
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid input"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Not authorized to update this general information",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "404",
+            description = "General information not found",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        )
+    )
+    suspend fun updateGeneralInformation(
+        @Parameter(description = "General information ID", required = true) @PathParam("id") id: String,
+        @Parameter(description = "General information update data", required = true) request: UpdateGeneralInformationRequest
+    ): GeneralInformationResponse
 }

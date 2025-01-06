@@ -35,6 +35,7 @@ enum class ErrorCode(
 
     //General information errors
     GENERAL_INFORMATION_NOT_FOUND("GENERAL_INFORMATION_NOT_FOUND", 404, "The requested general information was not found"),
+    GENERAL_INFORMATION_UPDATE_ERROR("GENERAL_INFORMATION_UPDATE_ERROR", 400, "Failed to update general information"),
     GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information");
 
     companion object {

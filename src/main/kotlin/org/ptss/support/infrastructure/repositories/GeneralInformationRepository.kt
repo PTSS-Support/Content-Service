@@ -63,4 +63,19 @@ class GeneralInformationRepository(
         tableClient.createEntity(tableEntity)
         return generalInformation.id.toString()
     }
+
+    override suspend fun update(id: String, title: String, content: String, ): GeneralInformation? {
+        val entity = tableClient.getEntity("GENERAL_INFORMATION", id)
+
+        val updatedEntity = entity.apply {
+            properties["title"] = title
+            properties["content"] = content
+        }
+
+        tableClient.updateEntity(updatedEntity)
+
+        val updatedGeneralInformationEntity = GeneralInformationEntity.fromTableEntity(updatedEntity)
+        return updatedGeneralInformationEntity.toDomain().copy(id = UUID.fromString(updatedEntity.rowKey))
+    }
+
 }
