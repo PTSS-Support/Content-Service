@@ -4,10 +4,12 @@ import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.PUT
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
 import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.eclipse.microprofile.openapi.annotations.media.Content
 import org.eclipse.microprofile.openapi.annotations.media.Schema
@@ -149,4 +151,40 @@ interface IGeneralInformationController {
         @Parameter(description = "General information ID", required = true) @PathParam("id") id: String,
         @Parameter(description = "General information update data", required = true) request: UpdateGeneralInformationRequest
     ): GeneralInformationResponse
+
+    @DELETE
+    @Path("/{id}")
+    @Operation(summary = "Delete general information", description = "Deletes a specific general information by its ID")
+    @APIResponses(
+        APIResponse(
+            responseCode = "204",
+            description = "General information successfully deleted"
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid input"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Not authorized to delete this general information",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "404",
+            description = "General information not found",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        )
+    )
+    suspend fun deleteGeneralInformation(
+        @Parameter(description = "General information ID", required = true) @PathParam("id") id: String
+    ): Response
 }

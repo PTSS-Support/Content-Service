@@ -3,6 +3,7 @@ package org.ptss.support.api.controllers
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.PathParam
+import jakarta.ws.rs.core.Response
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
 import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
@@ -34,4 +35,9 @@ class GeneralInformationController(
 
     override suspend fun updateGeneralInformation(@PathParam("id") id: String, request: UpdateGeneralInformationRequest): GeneralInformationResponse =
         generalInformationFacade.updateGeneralInformation(id, request)
+
+    override suspend fun deleteGeneralInformation(@PathParam("id") id: String): Response {
+        generalInformationFacade.deleteGeneralInformation(id)
+        return Response.noContent().build()
+    }
 }

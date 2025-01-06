@@ -7,4 +7,5 @@ interface IGeneralInformationRepository {
     suspend fun getById(id: String): GeneralInformation?
     suspend fun create(generalInformation: GeneralInformation): String
     suspend fun update(id: String, title: String, content: String): GeneralInformation?
+    suspend fun delete(id: String): GeneralInformation?
 }

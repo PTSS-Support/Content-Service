@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
+import org.ptss.support.domain.commands.generalinformation.DeleteGeneralInformationCommand
 import org.ptss.support.domain.commands.generalinformation.UpdateGeneralInformationCommand
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
@@ -20,7 +21,8 @@ class GeneralInformationService(
     private val createGeneralInformationHandler: ICommandHandler<CreateGeneralInformationCommand, String>,
     private val getAllGeneralInformationHandler: GetAllGeneralInformationQueryHandler,
     private val getGeneralInformationByIdHandler: IQueryHandler<GetGeneralInformationByIdQuery, GeneralInformation?>,
-    private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>
+    private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>,
+    private val deleteGeneralInformationHandler: ICommandHandler<DeleteGeneralInformationCommand, Unit>,
 ) {
     private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
 
@@ -92,5 +94,21 @@ class GeneralInformationService(
         )
     }
 
-
+    suspend fun deleteGeneralInformationAsync(generalInformationId: String) {
+        logger.executeWithExceptionLoggingAsync(
+            operation = {
+                deleteGeneralInformationHandler.handleAsync(DeleteGeneralInformationCommand(generalInformationId))
+            },
+            logMessage = "Error deleting general information $generalInformationId",
+            exceptionHandling = { ex ->
+                when (ex) {
+                    is APIException -> ex
+                    else -> APIException(
+                        errorCode = ErrorCode.GENERAL_INFORMATION_DELETION_ERROR,
+                        message = "Unable to delete general information with ID $generalInformationId",
+                    )
+                }
+            }
+        )
+    }
 }

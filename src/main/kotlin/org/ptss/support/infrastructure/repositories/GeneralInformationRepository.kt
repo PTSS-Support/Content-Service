@@ -78,4 +78,10 @@ class GeneralInformationRepository(
         return updatedGeneralInformationEntity.toDomain().copy(id = UUID.fromString(updatedEntity.rowKey))
     }
 
+    override suspend fun delete(id: String): GeneralInformation? {
+        val entity = tableClient.getEntity("GENERAL_INFORMATION", id)
+        val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
+        tableClient.deleteEntity("GENERAL_INFORMATION", id)
+        return generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
+    }
 }

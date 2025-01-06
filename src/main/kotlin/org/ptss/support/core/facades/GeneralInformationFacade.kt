@@ -28,4 +28,7 @@ class GeneralInformationFacade @Inject constructor(
         val updatedGeneralInformation = generalInformationService.updateGeneralInformationAsync(id, request)
         return GeneralInformationMapper.toResponse(updatedGeneralInformation)
     }
+
+    suspend fun deleteGeneralInformation(id: String) =
+        generalInformationService.deleteGeneralInformationAsync(id)
 }
