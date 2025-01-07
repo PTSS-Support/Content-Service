@@ -15,6 +15,7 @@ import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformation
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.core.facades.GeneralInformationFacade
+import org.ptss.support.domain.constants.PaginationConstraints
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.domain.interfaces.controllers.IGeneralInformationController
 import org.ptss.support.security.Authentication
@@ -27,7 +28,11 @@ class GeneralInformationController(
 ) : IGeneralInformationController {
     override suspend fun getAllGeneralInformation(
         @QueryParam("cursor") cursor: String?,
-        @QueryParam("size") @DefaultValue("20") @Min(1) @Max(50) pageSize: Int
+        @QueryParam("size")
+        @DefaultValue(PaginationConstraints.DEFAULT_PAGE_SIZE.toString())
+        @Min(PaginationConstraints.MIN_PAGE_SIZE)
+        @Max(PaginationConstraints.MAX_PAGE_SIZE)
+        pageSize: Int
     ): PagedResult<GeneralInformationListItemResponse> =
         generalInformationFacade.getAllGeneralInformation(cursor, pageSize)
 

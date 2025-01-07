@@ -9,7 +9,7 @@ data class GeneralInformationEntity(
     var content: String = ""
 ) {
     fun toTableEntity(generalInformation: GeneralInformation): TableEntity {
-        return TableEntity("GENERAL_INFORMATION", generalInformation.id.toString()).apply {
+        return TableEntity("GeneralInformation", generalInformation.id.toString()).apply {
             properties.apply {
                 put("title", title)
                 put("content", content)
