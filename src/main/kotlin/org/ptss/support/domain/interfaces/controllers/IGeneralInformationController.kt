@@ -1,5 +1,6 @@
 package org.ptss.support.domain.interfaces.controllers
 
+import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.ws.rs.Consumes
@@ -125,7 +126,7 @@ interface IGeneralInformationController {
             content = [Content(schema = Schema(implementation = ServiceError::class))]
         )
     )
-    suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): CreateGeneralInformationResponse
+    suspend fun createGeneralInformation(@Valid request: CreateGeneralInformationRequest): CreateGeneralInformationResponse
 
     @PUT
     @Path("/{id}")
@@ -162,7 +163,7 @@ interface IGeneralInformationController {
     )
     suspend fun updateGeneralInformation(
         @Parameter(description = "General information ID", required = true) @PathParam("id") id: String,
-        @Parameter(description = "General information update data", required = true) request: UpdateGeneralInformationRequest
+        @Parameter(description = "General information update data", required = true) @Valid request: UpdateGeneralInformationRequest
     ): GeneralInformationResponse
 
     @DELETE
