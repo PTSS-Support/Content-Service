@@ -27,6 +27,7 @@ import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformation
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.exceptions.ServiceError
+import org.ptss.support.domain.constants.PaginationConstraints
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -59,7 +60,11 @@ interface IGeneralInformationController {
     )
     suspend fun getAllGeneralInformation(
         @Parameter(description = "Cursor for pagination") @QueryParam("cursor") cursor: String?,
-        @Parameter(description = "Page size (1-50)") @QueryParam("size") @DefaultValue("20") @Min(1) @Max(50) pageSize: Int
+        @Parameter(description = "Page size (1-50)") @QueryParam("size")
+        @DefaultValue(PaginationConstraints.DEFAULT_PAGE_SIZE.toString())
+        @Min(PaginationConstraints.MIN_PAGE_SIZE)
+        @Max(PaginationConstraints.MAX_PAGE_SIZE)
+        pageSize: Int
     ): PagedResult<GeneralInformationListItemResponse>
 
     @GET

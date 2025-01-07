@@ -1,4 +1,4 @@
-package org.ptss.support.common.extensions
+package org.ptss.support.common.extensions.pagination
 
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 
