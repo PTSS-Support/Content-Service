@@ -11,4 +11,7 @@ interface AzureStorageConfig {
 
     @WithName("table-name")
     fun tableName(): String
+
+    @WithName("container-name")
+    fun containerName(): String
 }
