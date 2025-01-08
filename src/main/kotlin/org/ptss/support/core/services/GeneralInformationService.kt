@@ -8,6 +8,7 @@ import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformat
 import org.ptss.support.domain.commands.generalinformation.DeleteGeneralInformationCommand
 import org.ptss.support.domain.commands.generalinformation.UpdateGeneralInformationCommand
 import org.ptss.support.domain.commands.media.CreateMediaCommand
+import org.ptss.support.domain.commands.media.DeleteMediaCommand
 import org.ptss.support.domain.constants.FileSizeConstants.MAX_FILE_SIZE
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
@@ -29,6 +30,7 @@ class GeneralInformationService(
     private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>,
     private val deleteGeneralInformationHandler: ICommandHandler<DeleteGeneralInformationCommand, Unit>,
     private val createGeneralInformationMediaHandler: ICommandHandler<CreateMediaCommand, Media>,
+    private val deleteGeneralInformationMediaHandler: ICommandHandler<DeleteMediaCommand, Unit>,
 ) {
     private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
 
@@ -128,6 +130,24 @@ class GeneralInformationService(
                     errorCode = ErrorCode.MEDIA_CREATION_ERROR,
                     message = "Failed to upload media for ${command.generalInformationId}",
                 )
+            }
+        )
+    }
+
+    suspend fun deleteGeneralInformationMediaAsync(generalInformationId: String, mediaId: String) {
+        logger.executeWithExceptionLoggingAsync(
+            operation = {
+                deleteGeneralInformationMediaHandler.handleAsync(DeleteMediaCommand(generalInformationId, mediaId))
+            },
+            logMessage = "Error deleting media $mediaId for $generalInformationId",
+            exceptionHandling = { ex ->
+                when (ex) {
+                    is APIException -> ex
+                    else -> APIException(
+                        errorCode = ErrorCode.MEDIA_DELETION_ERROR,
+                        message = "Unable to delete media with ID $mediaId for $generalInformationId",
+                    )
+                }
             }
         )
     }

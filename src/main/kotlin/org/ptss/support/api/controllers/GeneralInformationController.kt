@@ -59,4 +59,9 @@ class GeneralInformationController(
         @RestForm("file") file: InputStream,
         @RestForm("href") href: String?
     ): MediaResponse = generalInformationFacade.createGeneralInformationMedia(id, CreateMediaRequest(file, href))
+
+    override suspend fun deleteGeneralInformationMedia(@PathParam("id") generalInformationId: String, @PathParam("mediaId") mediaId: String): Response {
+        generalInformationFacade.deleteGeneralInformationMedia(generalInformationId, mediaId)
+        return Response.noContent().build()
+    }
 }

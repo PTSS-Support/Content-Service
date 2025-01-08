@@ -11,4 +11,5 @@ interface IGeneralInformationRepository {
     suspend fun update(id: String, title: String, content: String): GeneralInformation?
     suspend fun delete(id: String): GeneralInformation?
     suspend fun createMedia(id: String, media: Media? = null): GeneralInformation?
+    suspend fun deleteMedia(generalInformationId: String, mediaId: String): Media?
 }

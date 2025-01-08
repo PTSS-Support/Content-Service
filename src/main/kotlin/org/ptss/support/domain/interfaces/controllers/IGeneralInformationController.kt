@@ -234,4 +234,41 @@ interface IGeneralInformationController {
         @Parameter(description = "Media file", required = true) @RestForm("file") file: InputStream,
         @Parameter(description = "Optional href", required = false) @RestForm("href") href: String?
     ): MediaResponse
+
+    @DELETE
+    @Path("/{id}/media/{mediaId}")
+    @Operation(summary = "Delete media file", description = "Deletes a media file by its ID")
+    @APIResponses(
+        APIResponse(
+            responseCode = "204",
+            description = "Media successfully deleted"
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid input"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Not authorized to delete this media file",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "404",
+            description = "Media not found",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        ),
+        APIResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = [Content(schema = Schema(implementation = ServiceError::class))]
+        )
+    )
+    suspend fun deleteGeneralInformationMedia(
+        @Parameter(description = "General Information ID", required = true) @PathParam("id") generalInformationId: String,
+        @Parameter(description = "Media ID", required = true) @PathParam("mediaId") mediaId: String
+    ): Response
 }

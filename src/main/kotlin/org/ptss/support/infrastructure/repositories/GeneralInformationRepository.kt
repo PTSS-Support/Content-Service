@@ -2,6 +2,7 @@ package org.ptss.support.infrastructure.repositories
 
 import com.azure.data.tables.TableClient
 import com.azure.data.tables.TableServiceClientBuilder
+import com.azure.data.tables.models.TableEntityUpdateMode
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
@@ -58,7 +59,6 @@ class GeneralInformationRepository(
         return generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
     }
 
-
     override suspend fun create(generalInformation: GeneralInformation): String {
         val generalInformationEntity = GeneralInformationEntity(
             title = generalInformation.title,
@@ -103,5 +103,39 @@ class GeneralInformationRepository(
 
         val updatedGeneralInformationEntity = GeneralInformationEntity.fromTableEntity(updatedEntity)
         return updatedGeneralInformationEntity.toDomain().copy(id = UUID.fromString(updatedEntity.rowKey))
+    }
+
+    override suspend fun deleteMedia(generalInformationId: String, mediaId: String): Media? {
+        // Retrieve the entity from Azure Table Storage
+        val entity = tableClient.getEntity("GeneralInformation", generalInformationId)
+        println("Entity before deletion: ${entity.properties}")
+
+        val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
+
+        // Check if the media ID matches
+        if (generalInformationEntity.mediaId != mediaId) {
+            throw APIException(
+                errorCode = ErrorCode.MEDIA_NOT_FOUND,
+                message = "Media with ID $mediaId not found in General Information with ID $generalInformationId"
+            )
+        }
+
+        // Extract the media details before removal
+        val media = generalInformationEntity.toDomain().media
+
+        // Remove only the media properties
+        entity.properties.remove("mediaId")
+        entity.properties.remove("mediaUrl")
+        entity.properties.remove("mediaHref")
+        //println("Entity after removal of media fields: ${entity.properties}")
+
+        // Update the entity in Azure Table Storage using REPLACE mode
+        tableClient.updateEntity(entity, TableEntityUpdateMode.REPLACE)
+
+        // Fetch the entity again to verify the update
+        val updatedEntity = tableClient.getEntity("GeneralInformation", generalInformationId)
+        //println("Entity after update: ${updatedEntity.properties}")
+
+        return media
     }
 }

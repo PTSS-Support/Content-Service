@@ -48,4 +48,7 @@ class GeneralInformationFacade @Inject constructor(
         val media = generalInformationService.createGeneralInformationMedia(id, request.toCommand(id))
         return media.toResponse()
     }
+
+    suspend fun deleteGeneralInformationMedia(generalInformationId: String, mediaId: String) =
+        generalInformationService.deleteGeneralInformationMediaAsync(generalInformationId, mediaId)
 }
