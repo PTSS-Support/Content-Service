@@ -7,10 +7,13 @@ import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.commands.generalinformation.CreateGeneralInformationCommand
 import org.ptss.support.domain.commands.generalinformation.DeleteGeneralInformationCommand
 import org.ptss.support.domain.commands.generalinformation.UpdateGeneralInformationCommand
+import org.ptss.support.domain.commands.media.CreateMediaCommand
+import org.ptss.support.domain.constants.FileSizeConstants.MAX_FILE_SIZE
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
 import org.ptss.support.domain.interfaces.queries.IQueryHandler
 import org.ptss.support.domain.models.GeneralInformation
+import org.ptss.support.domain.models.Media
 import org.ptss.support.domain.queries.generalinformation.GetAllGeneralInformationQuery
 import org.ptss.support.domain.queries.generalinformation.GetGeneralInformationByIdQuery
 import org.ptss.support.infrastructure.handlers.queries.generalinformation.GetAllGeneralInformationQueryHandler
@@ -25,6 +28,7 @@ class GeneralInformationService(
     private val getGeneralInformationByIdHandler: IQueryHandler<GetGeneralInformationByIdQuery, GeneralInformation?>,
     private val updateGeneralInformationHandler: ICommandHandler<UpdateGeneralInformationCommand, GeneralInformation>,
     private val deleteGeneralInformationHandler: ICommandHandler<DeleteGeneralInformationCommand, Unit>,
+    private val createGeneralInformationMediaHandler: ICommandHandler<CreateMediaCommand, Media>,
 ) {
     private val logger = LoggerFactory.getLogger(GeneralInformationService::class.java)
 
@@ -112,5 +116,30 @@ class GeneralInformationService(
                 }
             }
         )
+    }
+
+    suspend fun createGeneralInformationMedia(generalInformationId: String, command: CreateMediaCommand): Media {
+        validateMediaCommand(command)
+        return logger.executeWithExceptionLoggingAsync(
+            operation = { createGeneralInformationMediaHandler.handleAsync(command) },
+            logMessage = "Error uploading media for ${command.generalInformationId}",
+            exceptionHandling = { ex ->
+                APIException(
+                    errorCode = ErrorCode.MEDIA_CREATION_ERROR,
+                    message = "Failed to upload media for ${command.generalInformationId}",
+                )
+            }
+        )
+    }
+
+    private suspend fun validateMediaCommand(command: CreateMediaCommand) {
+        val fileSize = command.fileData?.available()?.toLong() ?: 0
+
+        if (fileSize > MAX_FILE_SIZE) {
+            throw APIException(
+                errorCode = ErrorCode.FILE_SIZE_EXCEEDED,
+                message = "File size exceeds the maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB"
+            )
+        }
     }
 }

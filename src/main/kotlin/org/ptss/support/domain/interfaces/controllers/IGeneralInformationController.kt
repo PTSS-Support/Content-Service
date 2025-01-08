@@ -21,14 +21,17 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses
+import org.jboss.resteasy.reactive.RestForm
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
 import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
+import org.ptss.support.api.dtos.responses.media.MediaResponse
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.exceptions.ServiceError
 import org.ptss.support.domain.constants.PaginationConstraints
+import java.io.InputStream
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -201,4 +204,34 @@ interface IGeneralInformationController {
     suspend fun deleteGeneralInformation(
         @Parameter(description = "General information ID", required = true) @PathParam("id") id: String
     ): Response
+
+    @POST
+    @Path("/{id}/media")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Creating media", description = "creating a new media file")
+    @APIResponses(
+        APIResponse(
+            responseCode = "201",
+            description = "Media created successfully",
+            content = [Content(schema = Schema(implementation = MediaResponse::class))]
+        ),
+        APIResponse(
+            responseCode = "400",
+            description = "Invalid input or file type or size"
+        ),
+        APIResponse(
+            responseCode = "401",
+            description = "Unauthorized"
+        ),
+        APIResponse(
+            responseCode = "403",
+            description = "Forbidden"
+        )
+    )
+    suspend fun createGeneralInformationMedia(
+        @Parameter(description = "ID of the general information", required = true) @PathParam("id") id: String,
+        @Parameter(description = "Media file", required = true) @RestForm("file") file: InputStream,
+        @Parameter(description = "Optional href", required = false) @RestForm("href") href: String?
+    ): MediaResponse
 }

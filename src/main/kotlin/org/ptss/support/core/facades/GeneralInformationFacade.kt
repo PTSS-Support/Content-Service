@@ -4,14 +4,18 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.ptss.support.api.dtos.requests.generalinformation.CreateGeneralInformationRequest
 import org.ptss.support.api.dtos.requests.generalinformation.UpdateGeneralInformationRequest
+import org.ptss.support.api.dtos.requests.media.CreateMediaRequest
 import org.ptss.support.api.dtos.responses.generalinformation.CreateGeneralInformationResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationListItemResponse
 import org.ptss.support.api.dtos.responses.generalinformation.GeneralInformationResponse
+import org.ptss.support.api.dtos.responses.media.MediaResponse
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.common.extensions.generalinformation.toCommand
 import org.ptss.support.common.extensions.generalinformation.toCreateResponse
 import org.ptss.support.common.extensions.generalinformation.toListItemResponse
 import org.ptss.support.common.extensions.generalinformation.toResponse
+import org.ptss.support.common.extensions.media.toCommand
+import org.ptss.support.common.extensions.media.toResponse
 import org.ptss.support.common.extensions.pagination.mapData
 import org.ptss.support.core.services.GeneralInformationService
 
@@ -39,4 +43,9 @@ class GeneralInformationFacade @Inject constructor(
 
     suspend fun deleteGeneralInformation(id: String) =
         generalInformationService.deleteGeneralInformationAsync(id)
+
+    suspend fun createGeneralInformationMedia(id: String, request: CreateMediaRequest): MediaResponse {
+        val media = generalInformationService.createGeneralInformationMedia(id, request.toCommand(id))
+        return media.toResponse()
+    }
 }

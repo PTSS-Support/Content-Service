@@ -37,7 +37,13 @@ enum class ErrorCode(
     GENERAL_INFORMATION_NOT_FOUND("GENERAL_INFORMATION_NOT_FOUND", 404, "The requested general information was not found"),
     GENERAL_INFORMATION_DELETION_ERROR("GENERAL_INFORMATION_DELETION_ERROR", 400, "Failed to delete general information"),
     GENERAL_INFORMATION_UPDATE_ERROR("GENERAL_INFORMATION_UPDATE_ERROR", 400, "Failed to update general information"),
-    GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information");
+    GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information"),
+
+    //Media errors
+    MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", 404, "The requested media was not found"),
+    MEDIA_CREATION_ERROR("MEDIA_CREATION_ERROR", 400, "Failed to upload media"),
+    MEDIA_DELETION_ERROR("MEDIA_DELETION_ERROR", 400, "Failed to delete media"),
+    FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", 400, "File size exceeds the maximum allowed limit");
 
     companion object {
         fun fromCode(code: String): ErrorCode? = values().find { it.code == code }
