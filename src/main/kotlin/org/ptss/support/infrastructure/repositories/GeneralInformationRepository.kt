@@ -106,35 +106,17 @@ class GeneralInformationRepository(
     }
 
     override suspend fun deleteMedia(generalInformationId: String, mediaId: String): Media? {
-        // Retrieve the entity from Azure Table Storage
         val entity = tableClient.getEntity("GeneralInformation", generalInformationId)
-        println("Entity before deletion: ${entity.properties}")
+        val media = GeneralInformationEntity.fromTableEntity(entity).toDomain().media
 
-        val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
-
-        // Check if the media ID matches
-        if (generalInformationEntity.mediaId != mediaId) {
-            throw APIException(
-                errorCode = ErrorCode.MEDIA_NOT_FOUND,
-                message = "Media with ID $mediaId not found in General Information with ID $generalInformationId"
-            )
-        }
-
-        // Extract the media details before removal
-        val media = generalInformationEntity.toDomain().media
-
-        // Remove only the media properties
-        entity.properties.remove("mediaId")
-        entity.properties.remove("mediaUrl")
-        entity.properties.remove("mediaHref")
-        //println("Entity after removal of media fields: ${entity.properties}")
-
-        // Update the entity in Azure Table Storage using REPLACE mode
-        tableClient.updateEntity(entity, TableEntityUpdateMode.REPLACE)
-
-        // Fetch the entity again to verify the update
-        val updatedEntity = tableClient.getEntity("GeneralInformation", generalInformationId)
-        //println("Entity after update: ${updatedEntity.properties}")
+        tableClient.updateEntity(
+            entity.apply {
+                listOf("mediaId", "mediaUrl", "mediaHref").forEach {
+                    properties.remove(it)
+                }
+            },
+            TableEntityUpdateMode.REPLACE
+        )
 
         return media
     }
