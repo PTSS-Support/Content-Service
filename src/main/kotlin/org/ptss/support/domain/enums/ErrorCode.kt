@@ -37,7 +37,12 @@ enum class ErrorCode(
     GENERAL_INFORMATION_NOT_FOUND("GENERAL_INFORMATION_NOT_FOUND", 404, "The requested general information was not found"),
     GENERAL_INFORMATION_DELETION_ERROR("GENERAL_INFORMATION_DELETION_ERROR", 400, "Failed to delete general information"),
     GENERAL_INFORMATION_UPDATE_ERROR("GENERAL_INFORMATION_UPDATE_ERROR", 400, "Failed to update general information"),
-    GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information");
+    GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information"),
+
+    //Emergency contact erros
+    EMERGENCY_CONTACT_NOT_FOUND("EMERGENCY_CONTACT_NOT_FOUND", 404, "The requested emergency contact was not found"),
+    EMERGENCY_CONTACT_CREATION_ERROR("EMERGENCY_CONTACT_CREATION_ERROR", 400, "Failed to create emergency contact"),
+    EMERGENCY_CONTACT_UPDATE_ERROR("EMERGENCY_CONTACT_UPDATE_ERROR", 400, "Failed to update emergency contact");
 
     companion object {
         fun fromCode(code: String): ErrorCode? = values().find { it.code == code }

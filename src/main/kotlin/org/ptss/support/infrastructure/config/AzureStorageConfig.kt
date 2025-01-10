@@ -9,6 +9,9 @@ interface AzureStorageConfig {
     @WithName("connection-string")
     fun connectionString(): String
 
-    @WithName("table-name")
-    fun tableName(): String
+    @WithName("general-information-table")
+    fun generalInformationTable(): String
+
+    @WithName("emergency-contact-table")
+    fun emergencyContactTable(): String
 }
