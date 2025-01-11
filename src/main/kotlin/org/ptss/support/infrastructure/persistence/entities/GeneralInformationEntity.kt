@@ -30,7 +30,7 @@ data class GeneralInformationEntity(
     companion object {
         fun fromTableEntity(entity: TableEntity): GeneralInformationEntity {
             return GeneralInformationEntity(
-                id = UUID.fromString(entity.rowKey),  // ✅ Set ID here
+                id = UUID.fromString(entity.rowKey),
                 title = entity.properties["title"] as String,
                 content = entity.properties["content"] as String,
                 mediaId = entity.properties["mediaId"] as String?,
@@ -41,7 +41,7 @@ data class GeneralInformationEntity(
     }
 
     fun toDomain(): GeneralInformation = GeneralInformation(
-        id = id ?: UUID.randomUUID(),  // ✅ Use the `id` property
+        id = UUID.randomUUID(),
         title = title,
         content = content,
         media = if (mediaId != null && mediaUrl != null) {
