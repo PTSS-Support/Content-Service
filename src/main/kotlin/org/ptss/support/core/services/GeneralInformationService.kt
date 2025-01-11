@@ -20,7 +20,8 @@ import org.ptss.support.domain.queries.generalinformation.GetGeneralInformationB
 import org.ptss.support.infrastructure.handlers.queries.generalinformation.GetAllGeneralInformationQueryHandler
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.slf4j.LoggerFactory
-import kotlin.math.ceil
+import java.io.InputStream
+import java.util.UUID
 
 @ApplicationScoped
 class GeneralInformationService(
@@ -152,7 +153,7 @@ class GeneralInformationService(
         )
     }
 
-    private suspend fun validateMediaCommand(command: CreateMediaCommand) {
+    suspend fun validateMediaCommand(command: CreateMediaCommand) {
         val fileSize = command.fileData?.available()?.toLong() ?: 0
 
         if (fileSize > MAX_FILE_SIZE) {
@@ -161,5 +162,33 @@ class GeneralInformationService(
                 message = "File size exceeds the maximum allowed size of ${MAX_FILE_SIZE / (1024 * 1024)}MB"
             )
         }
+    }
+
+    suspend fun detectFileTypeMagicNumbers(fileStream: InputStream): String {
+        val buffer = ByteArray(8)
+        fileStream.mark(8)
+        fileStream.read(buffer)
+        fileStream.reset()
+
+        return when {
+            buffer.startsWith(byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())) -> ".jpg"
+            buffer.startsWith(byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte())) -> ".png"
+            buffer.startsWith("RIFF".toByteArray()) && buffer.slice(8..11).toByteArray().contentEquals("WEBP".toByteArray()) -> ".webp"
+            buffer.startsWith(byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x18.toByte(), 0x66.toByte(), 0x74.toByte(), 0x79.toByte(), 0x70.toByte())) -> ".mp4"
+            buffer.startsWith(byteArrayOf(0x1A.toByte(), 0x45.toByte(), 0xDF.toByte(), 0xA3.toByte())) -> ".mkv"
+            buffer.startsWith("%PDF".toByteArray()) -> ".pdf"
+            else -> throw APIException(
+                errorCode = ErrorCode.MEDIA_CREATION_ERROR,
+                message = "Unsupported file type"
+            )
+        }
+    }
+
+    private fun ByteArray.startsWith(prefix: ByteArray): Boolean =
+        this.take(prefix.size).toByteArray().contentEquals(prefix)
+
+
+    suspend fun generateFileName(fileType: String): String {
+        return "${UUID.randomUUID()}$fileType"
     }
 }
