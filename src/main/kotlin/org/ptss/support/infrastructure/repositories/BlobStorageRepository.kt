@@ -14,7 +14,7 @@ class BlobStorageRepository(private val azureConfig: AzureStorageConfig) {
         .connectionString(azureConfig.connectionString())
         .buildClient()
 
-    private val containerClient: BlobContainerClient = blobServiceClient.getBlobContainerClient(azureConfig.containerName())
+    private val containerClient: BlobContainerClient = blobServiceClient.getBlobContainerClient(azureConfig.blobContainerName())
         .apply { if (!exists()) create() }
 
     suspend fun uploadFile(fileName: String, fileData: InputStream): String {
