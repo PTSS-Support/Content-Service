@@ -44,6 +44,12 @@ enum class ErrorCode(
     EMERGENCY_CONTACT_CREATION_ERROR("EMERGENCY_CONTACT_CREATION_ERROR", 400, "Failed to create emergency contact"),
     EMERGENCY_CONTACT_UPDATE_ERROR("EMERGENCY_CONTACT_UPDATE_ERROR", 400, "Failed to update emergency contact");
 
+    //Media errors
+    MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", 404, "The requested media was not found"),
+    MEDIA_CREATION_ERROR("MEDIA_CREATION_ERROR", 400, "Failed to upload media"),
+    MEDIA_DELETION_ERROR("MEDIA_DELETION_ERROR", 400, "Failed to delete media"),
+    FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", 400, "File size exceeds the maximum allowed limit");
+
     companion object {
         fun fromCode(code: String): ErrorCode? = values().find { it.code == code }
     }

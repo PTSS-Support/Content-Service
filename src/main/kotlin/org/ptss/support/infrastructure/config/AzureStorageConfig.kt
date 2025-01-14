@@ -14,4 +14,7 @@ interface AzureStorageConfig {
 
     @WithName("emergency-contact-table")
     fun emergencyContactTable(): String
+
+    @WithName("blob-container-name")
+    fun blobContainerName(): String
 }

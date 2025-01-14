@@ -1,10 +1,12 @@
 package org.ptss.support.infrastructure.repositories
 
 import com.azure.data.tables.TableClient
+import com.azure.data.tables.models.TableEntityUpdateMode
 import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.api.dtos.responses.pagination.PagedResult
 import org.ptss.support.domain.interfaces.repositories.IGeneralInformationRepository
 import org.ptss.support.domain.models.GeneralInformation
+import org.ptss.support.domain.models.Media
 import org.ptss.support.infrastructure.config.AzureStorageConfig
 import org.ptss.support.infrastructure.persistence.entities.GeneralInformationEntity
 import org.ptss.support.infrastructure.util.PaginationUtils.paginate
@@ -36,7 +38,6 @@ class GeneralInformationRepository(
         return generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
     }
 
-
     override suspend fun create(generalInformation: GeneralInformation): String {
         val generalInformationEntity = GeneralInformationEntity(
             title = generalInformation.title,
@@ -66,5 +67,36 @@ class GeneralInformationRepository(
         val generalInformationEntity = GeneralInformationEntity.fromTableEntity(entity)
         tableClient.deleteEntity("GeneralInformation", id)
         return generalInformationEntity.toDomain().copy(id = UUID.fromString(entity.rowKey))
+    }
+
+    override suspend fun createMedia(id: String, media: Media?): GeneralInformation? {
+        val entity = tableClient.getEntity("GeneralInformation", id)
+        val updatedEntity = entity.apply {
+            if (media != null) {
+                properties["mediaId"] = media.mediaId.toString()
+                properties["mediaUrl"] = media.url
+                properties["mediaHref"] = media.href
+            }
+        }
+        tableClient.updateEntity(updatedEntity)
+
+        val updatedGeneralInformationEntity = GeneralInformationEntity.fromTableEntity(updatedEntity)
+        return updatedGeneralInformationEntity.toDomain().copy(id = UUID.fromString(updatedEntity.rowKey))
+    }
+
+    override suspend fun deleteMedia(generalInformationId: String, mediaId: String): Media? {
+        val entity = tableClient.getEntity("GeneralInformation", generalInformationId)
+        val media = GeneralInformationEntity.fromTableEntity(entity).toDomain().media
+
+        tableClient.updateEntity(
+            entity.apply {
+                listOf("mediaId", "mediaUrl", "mediaHref").forEach {
+                    properties.remove(it)
+                }
+            },
+            TableEntityUpdateMode.REPLACE
+        )
+
+        return media
     }
 }
