@@ -164,25 +164,28 @@ class GeneralInformationService(
         }
     }
 
-    suspend fun detectFileTypeMagicNumbers(fileStream: InputStream): String {
+    suspend fun detectFileTypeAndContentType(fileStream: InputStream): Pair<String, String> {
         val buffer = ByteArray(8)
         fileStream.mark(8)
         fileStream.read(buffer)
         fileStream.reset()
 
-        return when {
-            buffer.startsWith(byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())) -> ".jpg"
-            buffer.startsWith(byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte())) -> ".png"
-            buffer.startsWith("RIFF".toByteArray()) && buffer.slice(8..11).toByteArray().contentEquals("WEBP".toByteArray()) -> ".webp"
-            buffer.startsWith(byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x18.toByte(), 0x66.toByte(), 0x74.toByte(), 0x79.toByte(), 0x70.toByte())) -> ".mp4"
-            buffer.startsWith(byteArrayOf(0x1A.toByte(), 0x45.toByte(), 0xDF.toByte(), 0xA3.toByte())) -> ".mkv"
-            buffer.startsWith("%PDF".toByteArray()) -> ".pdf"
+        val fileType = when {
+            buffer.startsWith(byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte())) -> ".jpg" to "image/jpeg"
+            buffer.startsWith(byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte())) -> ".png" to "image/png"
+            buffer.startsWith("RIFF".toByteArray()) && buffer.slice(8..11).toByteArray().contentEquals("WEBP".toByteArray()) -> ".webp" to "image/webp"
+            buffer.startsWith(byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x18.toByte(), 0x66.toByte(), 0x74.toByte(), 0x79.toByte(), 0x70.toByte())) -> ".mp4" to "video/mp4"
+            buffer.startsWith(byteArrayOf(0x1A.toByte(), 0x45.toByte(), 0xDF.toByte(), 0xA3.toByte())) -> ".mkv" to "video/x-matroska"
+            buffer.startsWith("%PDF".toByteArray()) -> ".pdf" to "application/pdf"
             else -> throw APIException(
                 errorCode = ErrorCode.MEDIA_CREATION_ERROR,
                 message = "Unsupported file type"
             )
         }
+
+        return fileType
     }
+
 
     private fun ByteArray.startsWith(prefix: ByteArray): Boolean =
         this.take(prefix.size).toByteArray().contentEquals(prefix)

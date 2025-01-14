@@ -21,9 +21,9 @@ class BlobStorageService(
             val bufferedStream = stream.buffered()
             logger.executeWithExceptionLoggingAsync(
                 operation = {
-                    val fileType = generalInformationService.detectFileTypeMagicNumbers(bufferedStream)
+                    val (fileType, contentType) = generalInformationService.detectFileTypeAndContentType(bufferedStream)
                     val fileName = generalInformationService.generateFileName(fileType)
-                    blobStorageRepository.uploadFile(fileName, bufferedStream)
+                    blobStorageRepository.uploadFile(fileName, bufferedStream, contentType)
                 },
                 logMessage = "Error uploading file to Azure Blob Storage",
                 exceptionHandling = {
@@ -36,6 +36,7 @@ class BlobStorageService(
         }
     }
 
+
     suspend fun deleteFileAsync(blobName: String) {
         logger.executeWithExceptionLoggingAsync(
             operation = { blobStorageRepository.deleteFile(blobName) },
@@ -47,5 +48,9 @@ class BlobStorageService(
                 )
             }
         )
+    }
+
+    suspend fun getPublicBlobUrl(blobName: String): String {
+        return blobStorageRepository.getBlobUrlWithSasToken(blobName)
     }
 }
