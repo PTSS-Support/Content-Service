@@ -42,7 +42,7 @@ enum class ErrorCode(
     //Emergency contact erros
     EMERGENCY_CONTACT_NOT_FOUND("EMERGENCY_CONTACT_NOT_FOUND", 404, "The requested emergency contact was not found"),
     EMERGENCY_CONTACT_CREATION_ERROR("EMERGENCY_CONTACT_CREATION_ERROR", 400, "Failed to create emergency contact"),
-    EMERGENCY_CONTACT_UPDATE_ERROR("EMERGENCY_CONTACT_UPDATE_ERROR", 400, "Failed to update emergency contact");
+    EMERGENCY_CONTACT_UPDATE_ERROR("EMERGENCY_CONTACT_UPDATE_ERROR", 400, "Failed to update emergency contact"),
 
     //Media errors
     MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", 404, "The requested media was not found"),

@@ -3,8 +3,6 @@ package org.ptss.support.infrastructure.util
 import com.azure.data.tables.TableClient
 import com.azure.data.tables.TableServiceClient
 import com.azure.data.tables.TableServiceClientBuilder
-import jakarta.annotation.PostConstruct
-import jakarta.enterprise.context.ApplicationScoped
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.enums.ErrorCode
 import org.slf4j.LoggerFactory
