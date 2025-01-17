@@ -23,7 +23,7 @@ class GeneralInformationControllerTest {
     fun testGetAllGeneralInformation() {
         // Mock the response from the service layer
         val expectedResponse = PagedResult(
-            data = listOf(GeneralInformationListItemResponse(UUID.randomUUID(), "Sample Title")),
+            data = listOf(GeneralInformationListItemResponse(UUID.randomUUID(), "Wat is PTSS?")),
             nextCursor = null,
             pageSize = 10,
             totalItems = 1,
@@ -43,7 +43,7 @@ class GeneralInformationControllerTest {
             .`when`().get("/general-information")
             .then()
             .statusCode(200)  // Expecting 200 OK
-            .body("data[0].title", equalTo("Sample Title"))
+            .body("data[0].title", equalTo("Wat is PTSS?"))
             .body("totalItems", equalTo(1))
     }
 
@@ -64,13 +64,16 @@ class GeneralInformationControllerTest {
         // Mock the service layer response
         coEvery { generalInformationFacade.createGeneralInformation(createRequest) } returns createdResponse
 
+        // Add the admin-specific access token to the cookie (ensure this is a valid admin token)
+        val accessToken = "eyJleHAiOjE3MzY0Njc4ODMsImlhdCI6MTczNjQ2NjY4MywianRpIjoiNmMyOTg2OWItZmNkMy00NjA0LWEyZjMtMWQ4NzA1N2M3Y2JiIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9wdHNzLXN1cHBvcnQiLCJzdWIiOiIxM2ZhZDAyYS03OTJlLTRmNWMtYTI3NC02ODNiZTgyZTY3NjYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhdXRoZW50aWNhdGlvbi1zZXJ2aWNlIiwic2lkIjoiNzU4MzlhOTctNjNmZC00OTJmLTgxOGMtZTViZDU5ODg2YjIwIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIqIl0sInNjb3BlIjoib3BlbmlkIHVzZXItZGV0YWlscyIsInVzZXJfaWQiOiIxM2ZhZDAyYS03OTJlLTRmNWMtYTI3NC02ODNiZTgyZTY3NjYiLCJncm91cF9pZCI6ImE1NWEzNWQzLTMwZjAtNDA4Yi1iMWQ0LWE2MDkxZWVjYzAzNiIsInJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwiZGVmYXVsdC1yb2xlcy1wdHNzLXN1cHBvcnQiLCJ1bWFfYXV0aG9yaXphdGlvbiJdLCJyb2xlIjoiYWRtaW4iLCJsYXN0X25hbWUiOiJEZXJzamFudCIsImZpcnN0X25hbWUiOiJGcmFuayIsImhhc19waW4iOmZhbHNlfQ.GdeD6gnPT1CvlSUJJGzRWZYfp86wFkd5Q6Ty5w48zS8"
         // Make the API call and assert the response
         RestAssured.given()
+            .cookie("access_token", accessToken)  // Adding admin access_token in Cookie
             .contentType("application/json")
             .body(createRequest)
             .`when`().post("/general-information")
             .then()
-            .statusCode(200)
+            .statusCode(200)  // Expecting 200 OK for successful creation
             .body("id", equalTo(createdResponse.id.toString()))
             .body("title", equalTo(createdResponse.title))
             .body("content", equalTo(createdResponse.content))
