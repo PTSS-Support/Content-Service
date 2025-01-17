@@ -15,6 +15,7 @@ import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.infrastructure.repositories.BlobStorageRepository
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.util.UUID
 
 @QuarkusTest
@@ -77,7 +78,7 @@ class BlobStorageServiceTest {
             blobStorageService.uploadFileAsync(inputStream)
         }.also { exception ->
             assertEquals(ErrorCode.MEDIA_CREATION_ERROR, exception.errorCode)
-            assertEquals("Failed to upload file to Azure Blob Storage", exception.message)
+            assertEquals("Unsupported file type", exception.message)
         }
     }
 
@@ -91,6 +92,50 @@ class BlobStorageServiceTest {
             blobStorageService.uploadFileAsync(emptyInputStream)
         }.also { exception ->
             assertEquals(ErrorCode.MEDIA_CREATION_ERROR, exception.errorCode)
+        }
+    }
+
+    @Test
+    fun `uploadFileAsync throws APIException when file type is unsupported`() = runTest {
+        // Arrange
+        val fileContent = "test content".toByteArray()
+        val inputStream = ByteArrayInputStream(fileContent)
+        val unsupportedFileType = ".exe"
+        val contentType = "application/octet-stream"
+
+        coEvery {
+            generalInformationService.detectFileTypeAndContentType(any())
+        } returns Pair(unsupportedFileType, contentType)
+
+        // Act & Assert
+        assertThrows<APIException> {
+            blobStorageService.uploadFileAsync(inputStream)
+        }.also { exception ->
+            assertEquals(ErrorCode.MEDIA_CREATION_ERROR, exception.errorCode)
+            assertEquals("Unsupported file type", exception.message)
+        }
+    }
+
+    @Test
+    fun `uploadFileAsync throws APIException when file name generation fails`() = runTest {
+        // Arrange
+        val fileContent = "test content".toByteArray()
+        val inputStream = ByteArrayInputStream(fileContent)
+
+        coEvery {
+            generalInformationService.detectFileTypeAndContentType(any())
+        } returns Pair(".jpg", "image/jpeg")
+
+        coEvery {
+            generalInformationService.generateFileName(".jpg")
+        } throws RuntimeException("File name generation failed")
+
+        // Act & Assert
+        assertThrows<APIException> {
+            blobStorageService.uploadFileAsync(inputStream)
+        }.also { exception ->
+            assertEquals(ErrorCode.MEDIA_CREATION_ERROR, exception.errorCode)
+            assertEquals("Unsupported file type", exception.message)
         }
     }
 
@@ -125,7 +170,7 @@ class BlobStorageServiceTest {
             assertEquals("Failed to delete blob test-blob.jpg", exception.message)
         }
     }
-
+    
     @Test
     fun `deleteFileAsync handles non-existent blob gracefully`() = runTest {
         // Arrange
@@ -141,6 +186,22 @@ class BlobStorageServiceTest {
         }
     }
 
+    @Test
+    fun `deleteFileAsync throws APIException when deletion fails due to network issue`() = runTest {
+        // Arrange
+        val blobName = "test-blob.jpg"
+        coEvery {
+            blobStorageRepository.deleteFile(blobName)
+        } throws RuntimeException("Network failure")
+
+        // Act & Assert
+        assertThrows<APIException> {
+            blobStorageService.deleteFileAsync(blobName)
+        }.also { exception ->
+            assertEquals(ErrorCode.MEDIA_DELETION_ERROR, exception.errorCode)
+            assertEquals("Failed to delete blob test-blob.jpg", exception.message)
+        }
+    }
 
     @Test
     fun `getPublicBlobUrl returns correct URL`() = runTest {
