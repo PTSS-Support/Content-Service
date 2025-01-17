@@ -170,7 +170,7 @@ class BlobStorageServiceTest {
             assertEquals("Failed to delete blob test-blob.jpg", exception.message)
         }
     }
-    
+
     @Test
     fun `deleteFileAsync handles non-existent blob gracefully`() = runTest {
         // Arrange
