@@ -39,6 +39,11 @@ enum class ErrorCode(
     GENERAL_INFORMATION_UPDATE_ERROR("GENERAL_INFORMATION_UPDATE_ERROR", 400, "Failed to update general information"),
     GENERAL_INFORMATION_CREATION_ERROR("GENERAL_INFORMATION_CREATION_ERROR", 400, "Failed to create general information"),
 
+    //Emergency contact erros
+    EMERGENCY_CONTACT_NOT_FOUND("EMERGENCY_CONTACT_NOT_FOUND", 404, "The requested emergency contact was not found"),
+    EMERGENCY_CONTACT_CREATION_ERROR("EMERGENCY_CONTACT_CREATION_ERROR", 400, "Failed to create emergency contact"),
+    EMERGENCY_CONTACT_UPDATE_ERROR("EMERGENCY_CONTACT_UPDATE_ERROR", 400, "Failed to update emergency contact"),
+
     //Media errors
     MEDIA_NOT_FOUND("MEDIA_NOT_FOUND", 404, "The requested media was not found"),
     MEDIA_CREATION_ERROR("MEDIA_CREATION_ERROR", 400, "Failed to upload media"),
