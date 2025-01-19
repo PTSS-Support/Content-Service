@@ -2,21 +2,20 @@ package org.ptss.support.security
 
 import io.quarkus.logging.Log
 import io.quarkus.security.UnauthorizedException
-import io.smallrye.jwt.auth.principal.JWTAuthContextInfo
 import io.smallrye.jwt.auth.principal.JWTParser
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
-import jakarta.json.Json
-import jakarta.json.JsonArray
-import jakarta.json.JsonException
-import jakarta.json.JsonValue
-import org.eclipse.microprofile.jwt.JsonWebToken
 import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.context.UserContext
+import io.smallrye.jwt.auth.principal.JWTAuthContextInfo
+import jakarta.json.*
+import org.eclipse.microprofile.jwt.JsonWebToken
 import org.ptss.support.security.jwt.SimpleJsonWebToken
-import java.util.*
+import java.util.Optional
+import java.util.UUID
+import java.util.Base64
 
 @ApplicationScoped
 class TokenUserExtractor @Inject constructor(
@@ -80,8 +79,7 @@ class TokenUserExtractor @Inject constructor(
             userId = userId,
             groupId = extractGroupId(jwt),
             roles = extractRole(jwt),
-            hasPin = extractHasPin(jwt),
-            firstName = jwt.getClaim("first_name") ?: throw UnauthorizedException("Missing first_name claim")
+            hasPin = extractHasPin(jwt)
         )
     }
 
