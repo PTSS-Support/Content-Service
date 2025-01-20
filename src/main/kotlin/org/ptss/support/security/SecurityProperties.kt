@@ -3,7 +3,7 @@ package org.ptss.support.security
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.eclipse.microprofile.config.inject.ConfigProperty
-import java.util.*
+import java.util.Optional
 
 @ApplicationScoped
 class SecurityProperties @Inject constructor(
