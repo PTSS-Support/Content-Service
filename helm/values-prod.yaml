@@ -5,7 +5,7 @@ image:
 
 resources:
   limits:
-    cpu: 500m
+    cpu: 300m
     memory: 1Gi
   
 securityContext:
