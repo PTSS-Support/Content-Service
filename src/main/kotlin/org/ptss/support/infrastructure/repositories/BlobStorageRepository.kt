@@ -7,13 +7,17 @@ import com.azure.storage.blob.models.BlobHttpHeaders
 import com.azure.storage.blob.sas.BlobSasPermission
 import com.azure.storage.blob.sas.BlobServiceSasSignatureValues
 import jakarta.enterprise.context.ApplicationScoped
+import org.eclipse.microprofile.faulttolerance.Bulkhead
+import org.eclipse.microprofile.faulttolerance.Fallback
+import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException
+import org.ptss.support.domain.interfaces.repositories.IBlobStorageRepository
 import org.ptss.support.infrastructure.config.AzureStorageConfig
 import org.ptss.support.infrastructure.util.retryWithExponentialBackoff
 import java.io.InputStream
 import java.time.OffsetDateTime
 
 @ApplicationScoped
-class BlobStorageRepository(private val azureConfig: AzureStorageConfig) {
+class BlobStorageRepository(private val azureConfig: AzureStorageConfig) : IBlobStorageRepository {
 
     private val blobServiceClient: BlobServiceClient = BlobServiceClientBuilder()
         .connectionString(azureConfig.connectionString())
@@ -22,7 +26,9 @@ class BlobStorageRepository(private val azureConfig: AzureStorageConfig) {
     private val containerClient: BlobContainerClient = blobServiceClient.getBlobContainerClient(azureConfig.blobContainerName())
         .apply { if (!exists()) create() }
 
-    suspend fun uploadFile(fileName: String, fileData: InputStream, contentType: String): String {
+    @Bulkhead
+    @Fallback(fallbackMethod = "fallbackForUploadFile")
+    override suspend fun uploadFile(fileName: String, fileData: InputStream, contentType: String): String {
         val blobClient = containerClient.getBlobClient(fileName)
 
         blobClient.upload(fileData, true)
@@ -33,7 +39,7 @@ class BlobStorageRepository(private val azureConfig: AzureStorageConfig) {
         return blobClient.blobUrl
     }
 
-    suspend fun deleteFile(blobName: String) {
+    override suspend fun deleteFile(blobName: String) {
         val blobClient = containerClient.getBlobClient(blobName)
         blobClient.delete()
     }
@@ -55,5 +61,9 @@ class BlobStorageRepository(private val azureConfig: AzureStorageConfig) {
             val sasToken = blobClient.generateSas(sasValues)
             "${blobClient.blobUrl}?$sasToken"
         }
+    }
+
+    suspend fun fallbackForUploadFile(fileName: String, fileData: InputStream, contentType: String): String {
+        throw CircuitBreakerOpenException("Identity creation temporarily unavailable")
     }
 }
