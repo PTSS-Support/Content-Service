@@ -26,7 +26,7 @@ import java.io.InputStream
 
 @Path("/general-information")
 @ApplicationScoped
-@Authentication(roles = [Role.ADMIN])
+@Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.HCP, Role.FAMILY_MEMBER])
 class GeneralInformationController(
     private val generalInformationFacade: GeneralInformationFacade
 ) : IGeneralInformationController {
@@ -43,23 +43,28 @@ class GeneralInformationController(
     override suspend fun getGeneralInformationById(@PathParam("id") id: String): GeneralInformationResponse? =
         generalInformationFacade.getGeneralInformationById(id)
 
+    @Authentication(roles = [Role.ADMIN])
     override suspend fun createGeneralInformation(request: CreateGeneralInformationRequest): CreateGeneralInformationResponse =
         generalInformationFacade.createGeneralInformation(request)
 
+    @Authentication(roles = [Role.ADMIN])
     override suspend fun updateGeneralInformation(@PathParam("id") id: String, request: UpdateGeneralInformationRequest): GeneralInformationResponse =
         generalInformationFacade.updateGeneralInformation(id, request)
 
+    @Authentication(roles = [Role.ADMIN])
     override suspend fun deleteGeneralInformation(@PathParam("id") id: String): Response {
         generalInformationFacade.deleteGeneralInformation(id)
         return Response.noContent().build()
     }
 
+    @Authentication(roles = [Role.ADMIN])
     override suspend fun createGeneralInformationMedia(
         @PathParam("id") id: String,
         @RestForm("file") file: InputStream,
         @RestForm("href") href: String?
     ): MediaResponse = generalInformationFacade.createGeneralInformationMedia(id, CreateMediaRequest(file, href))
 
+    @Authentication(roles = [Role.ADMIN])
     override suspend fun deleteGeneralInformationMedia(@PathParam("id") generalInformationId: String, @PathParam("mediaId") mediaId: String): Response {
         generalInformationFacade.deleteGeneralInformationMedia(generalInformationId, mediaId)
         return Response.noContent().build()
