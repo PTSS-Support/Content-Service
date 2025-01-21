@@ -15,8 +15,13 @@ import org.ptss.support.common.exceptions.APIException
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.enums.Role
 import org.ptss.support.security.context.UserContext
+import io.smallrye.jwt.auth.principal.JWTAuthContextInfo
+import jakarta.json.*
+import org.eclipse.microprofile.jwt.JsonWebToken
 import org.ptss.support.security.jwt.SimpleJsonWebToken
-import java.util.*
+import java.util.Optional
+import java.util.UUID
+import java.util.Base64
 
 @ApplicationScoped
 class TokenUserExtractor @Inject constructor(
@@ -80,8 +85,7 @@ class TokenUserExtractor @Inject constructor(
             userId = userId,
             groupId = extractGroupId(jwt),
             roles = extractRole(jwt),
-            hasPin = extractHasPin(jwt),
-            firstName = jwt.getClaim("first_name") ?: throw UnauthorizedException("Missing first_name claim")
+            hasPin = extractHasPin(jwt)
         )
     }
 
