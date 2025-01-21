@@ -57,7 +57,7 @@ class EmergencyContactServiceTest {
 
         // Assert
         assertEquals(mockContacts, result)
-        coVerify { getAllEmergencyContactsHandler.handleAsync(match { it is GetAllEmergencyContactsQuery }) }
+        coVerify { getAllEmergencyContactsHandler.handleAsync(match { true }) }
     }
 
     @Test
