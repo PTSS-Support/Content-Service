@@ -25,15 +25,18 @@ class CreateMediaCommandHandler(
             operation = {
                 val mediaId = UUID.randomUUID()
 
-                val blobUrl = blobStorageService.uploadFileAsync(command.fileData
-                    ?: throw APIException(
+                val blobUrl = blobStorageService.uploadFileAsync(
+                    command.fileData ?: throw APIException(
                         errorCode = ErrorCode.MEDIA_NOT_FOUND,
                         message = "File data is required"
-                    ))
+                    )
+                )
+
+                val publicUrl = blobStorageService.getPublicBlobUrl(blobUrl.substringAfterLast("/"))
 
                 val media = Media(
                     mediaId = mediaId,
-                    url = blobUrl,
+                    url = publicUrl,
                     href = command.href
                 )
 

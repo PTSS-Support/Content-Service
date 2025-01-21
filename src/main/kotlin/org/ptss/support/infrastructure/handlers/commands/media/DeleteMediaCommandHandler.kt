@@ -6,11 +6,10 @@ import org.ptss.support.core.services.BlobStorageService
 import org.ptss.support.domain.commands.media.DeleteMediaCommand
 import org.ptss.support.domain.enums.ErrorCode
 import org.ptss.support.domain.interfaces.commands.ICommandHandler
-import org.ptss.support.domain.models.Media
 import org.ptss.support.infrastructure.repositories.GeneralInformationRepository
 import org.ptss.support.infrastructure.util.executeWithExceptionLoggingAsync
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.net.URI
 
 @ApplicationScoped
 class DeleteMediaCommandHandler(
@@ -36,6 +35,7 @@ class DeleteMediaCommandHandler(
     }
 
     private fun extractBlobName(url: String): String {
-        return url.substringAfterLast("/")
+        val uri = URI(url)
+        return uri.path.substringAfterLast("/")
     }
 }
