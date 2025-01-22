@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import org.eclipse.microprofile.faulttolerance.Bulkhead
 import org.eclipse.microprofile.faulttolerance.Fallback
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException
+import org.ptss.support.domain.constants.SasConstraints.INFINITE_EXPIRY_MINUTES
 import org.ptss.support.domain.interfaces.repositories.IBlobStorageRepository
 import org.ptss.support.infrastructure.config.AzureStorageConfig
 import org.ptss.support.infrastructure.util.retryWithExponentialBackoff
@@ -44,7 +45,7 @@ class BlobStorageRepository(private val azureConfig: AzureStorageConfig) : IBlob
         blobClient.delete()
     }
 
-    suspend fun getBlobUrlWithSasToken(blobName: String, expiryMinutes: Long = 60): String {
+    suspend fun getBlobUrlWithSasToken(blobName: String, expiryMinutes: Long = INFINITE_EXPIRY_MINUTES): String {
         val blobClient = containerClient.getBlobClient(blobName)
 
         val sasPermission = BlobSasPermission()
