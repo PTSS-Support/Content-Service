@@ -29,7 +29,7 @@ class BlobStorageService(
                 exceptionHandling = {
                     APIException(
                         errorCode = ErrorCode.MEDIA_CREATION_ERROR,
-                        message = "Failed to upload file to Azure Blob Storage"
+                        message = "Unsupported file type"
                     )
                 }
             )
