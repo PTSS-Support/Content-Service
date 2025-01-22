@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class UserContext(
     val userId: UUID,
-    val groupId: UUID?, // Could be empty for Role.ADMIN and Role.HCP
+    val groupId: UUID?, // Could be empty for Role.ADMIN and Role.HEALTHCARE_PROFESSIONAL
     val roles: Set<Role>,
     val hasPin: Boolean
 )

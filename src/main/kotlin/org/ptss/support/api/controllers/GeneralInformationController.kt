@@ -26,7 +26,7 @@ import java.io.InputStream
 
 @Path("/general-information")
 @ApplicationScoped
-@Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.HCP, Role.FAMILY_MEMBER])
+@Authentication(roles = [Role.ADMIN, Role.PATIENT, Role.HEALTHCARE_PROFESSIONAL, Role.FAMILY_MEMBER])
 class GeneralInformationController(
     private val generalInformationFacade: GeneralInformationFacade
 ) : IGeneralInformationController {

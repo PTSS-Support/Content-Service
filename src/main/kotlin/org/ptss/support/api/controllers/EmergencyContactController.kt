@@ -12,7 +12,6 @@ import org.ptss.support.security.Authentication
 
 @Path("/emergency-contacts")
 @ApplicationScoped
-@Authentication(roles = [Role.PATIENT])
 class EmergencyContactController(
     private val emergencyContactFacade: EmergencyContactFacade
 ): IEmergencyContactController {

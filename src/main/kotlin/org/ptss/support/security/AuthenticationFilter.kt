@@ -70,9 +70,9 @@ class AuthenticationFilter @Inject constructor(
     // Just a little extra line of defense
     // See Defense in depth: https://en.wikipedia.org/wiki/Defense_in_depth_(computing)
     private fun validateGroupIdConstraints(context: UserContext) {
-        val isAdminOrHCP = context.roles.any { it == Role.ADMIN || it == Role.HCP }
+        val isAdminOrHCP = context.roles.any { it == Role.ADMIN || it == Role.HEALTHCARE_PROFESSIONAL }
         if (!isAdminOrHCP && context.groupId == null) {
-            throw UnauthorizedException("Group ID is required for non-admin/HCP users")
+            throw UnauthorizedException("Group ID is required for non-admin/HEALTHCARE_PROFESSIONAL users")
         }
     }
 
